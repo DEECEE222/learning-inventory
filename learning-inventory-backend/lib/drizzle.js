@@ -1,5 +1,6 @@
 const { neon } = require('@neondatabase/serverless');
 const { drizzle } = require('drizzle-orm/neon-http');
+const { eq } = require('drizzle-orm');
 const { categories, products } = require('./schema');
 require('dotenv').config();
 
@@ -16,7 +17,7 @@ async function getProductsWithCategory() {
       categoria: categories.name,
     })
     .from(products)
-    .innerJoin(categories, products.category_id === categories.id);
+    .innerJoin(categories, eq(products.category_id, categories.id));
 
   return result;
 }
