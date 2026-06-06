@@ -1,5 +1,6 @@
 const express = require('express');
 const { sql } = require('./lib/db');
+const { getProductsWithCategory } = require('./lib/drizzle');
 require('dotenv').config();
 const cors = require('cors');
 
@@ -7,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// GET - obtener todos los productos con su categoría
+// GET - obtener todos los productos con su categoría (SQL puro)
 app.get('/api/products', async (req, res) => {
   try {
     const products = await sql`
@@ -38,6 +39,16 @@ app.post('/api/products', async (req, res) => {
       RETURNING *
     `;
     res.status(201).json(result[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET con Drizzle ORM
+app.get('/api/products-drizzle', async (req, res) => {
+  try {
+    const products = await getProductsWithCategory();
+    res.json(products);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
